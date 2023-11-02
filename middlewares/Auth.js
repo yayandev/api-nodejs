@@ -5,7 +5,7 @@ export const verifyToken = (req, res, next) => {
   try {
     if (!req.headers.authorization) {
       return res.status(401).json({
-        message: "Missing authorization header!",
+        message: "Unauthorized",
         success: false,
       });
     }
