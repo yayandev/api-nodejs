@@ -13,6 +13,7 @@ model User {
    email     String @unique
    password  String
    skills    Skill[] 
+   projects  Project[]
    createdAt DateTime @default(now())
    updatedAt DateTime @updatedAt
 }
@@ -24,4 +25,21 @@ model Skill {
    updatedAt DateTime @updatedAt
    author    User     @relation(fields: [authorId], references: [id])
    authorId  String   @db.ObjectId
+   projectsIds String[]   @db.ObjectId
+   projects  Project[] @relation(fields: [projectsIds], references: [id])
 }
+
+model Project {
+   id        String   @id @default(auto()) @map("_id") @db.ObjectId
+   title     String
+   description String
+   image     String
+   id_image  String
+   author    User     @relation(fields: [authorId], references: [id])
+   authorId  String   @db.ObjectId
+   skilsIds String[] @db.ObjectId
+   skills   Skill[]   @relation(fields: [skilsIds], references: [id])
+   createdAt DateTime @default(now())
+   updatedAt DateTime @updatedAt
+}
+
