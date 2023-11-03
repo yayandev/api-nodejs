@@ -44,7 +44,7 @@ export const AddProject = async (req, res) => {
         }
 
         res.json({
-          message: "File uploaded successfully",
+          message: "Project created successfully",
           success: true,
           data: newProject,
         });
@@ -66,6 +66,8 @@ export const getAllProjects = async (req, res) => {
         title: true,
         description: true,
         image: true,
+        createdAt: true,
+        updatedAt: true,
         author: {
           select: {
             id: true,
@@ -106,6 +108,8 @@ export const getOneProject = async (req, res) => {
         title: true,
         description: true,
         image: true,
+        createdAt: true,
+        updatedAt: true,
         author: {
           select: {
             id: true,
@@ -199,6 +203,120 @@ export const deleteOne = async (req, res) => {
       success: true,
       data: project,
       deleteImageResult,
+    });
+  } catch (error) {
+    return res.json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
+
+export const updateProject = async (req, res) => {
+  try {
+    const body = req.body;
+    const file = await req.file;
+    const id = req.params.id;
+    const { title, description, skills } = body;
+    const authorId = req.user.id;
+
+    if (!title || !description || !skills) {
+      return res.status(400).json({
+        message: "Please provide all required fields",
+        success: false,
+      });
+    }
+
+    const project = await db.project.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!project) {
+      return res.json({
+        message: "Project not found",
+        success: false,
+      });
+    }
+
+    if (project.authorId !== authorId) {
+      return res.json({
+        message: "You are not authorized to update this project",
+        success: false,
+      });
+    }
+
+    const idImageOld = project.id_image;
+
+    if (file) {
+      cloudinary.uploader
+        .upload_stream({ resource_type: "auto" }, async (error, result) => {
+          if (error) {
+            return res.status(500).json({
+              message: error.message,
+              success: false,
+            });
+          }
+
+          const { public_id, secure_url } = result;
+
+          const updateProject = await db.project.update({
+            where: {
+              id: id,
+            },
+            data: {
+              title,
+              description,
+              skilsIds: JSON.parse(skills),
+              authorId,
+              image: secure_url,
+              id_image: public_id,
+            },
+          });
+
+          if (!updateProject) {
+            return res.status(400).json({
+              message: "Project not updated",
+              success: false,
+            });
+          }
+
+          const deleteImageResult = await cloudinary.uploader.destroy(
+            idImageOld
+          );
+
+          return res.json({
+            message: "Project updated successfully",
+            success: true,
+            data: updateProject,
+          });
+        })
+        .end(file.buffer);
+    }
+
+    const updateProject = await db.project.update({
+      where: {
+        id: id,
+      },
+      data: {
+        title,
+        description,
+        skilsIds: JSON.parse(skills),
+      },
+    });
+
+    if (!updateProject) {
+      return res.json({
+        message: "Project not updated",
+        success: false,
+      });
+    }
+
+    return res.json({
+      message: "Project updated successfully",
+      success: true,
+      data: updateProject,
     });
   } catch (error) {
     return res.json({
