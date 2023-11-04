@@ -176,3 +176,115 @@ export const Logout = async (req, res) => {
     });
   }
 };
+
+export const changePassword = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { oldPassword, newPassword, confirmPassword } = req.body;
+
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({
+        message: "Please provide all required fields",
+        success: false,
+      });
+    }
+
+    const user = await db.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+
+    const isMatch = await bcryptjs.compare(oldPassword, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Old password is incorrect",
+        success: false,
+      });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        message: "Passwords do not match",
+        success: false,
+      });
+    }
+
+    const hashedPassword = await bcryptjs.hash(newPassword, 10);
+
+    const updatedUser = await db.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    if (!updatedUser) {
+      return res.status(500).json({
+        message: "Failed to change password",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Password changed successfully",
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+      success: true,
+    });
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    const body = req.body;
+    const { name } = body;
+    const userId = req.user.id;
+
+    if (!name) {
+      return res.status(400).json({
+        message: "Please provide all required fields",
+        success: false,
+      });
+    }
+
+    const updatedUser = await db.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        name,
+      },
+    });
+
+    if (!updatedUser) {
+      return res.status(500).json({
+        message: "Failed to update profile",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
