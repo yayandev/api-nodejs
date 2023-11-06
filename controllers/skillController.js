@@ -41,13 +41,7 @@ export const AddSkill = async (req, res) => {
 
 export const GetSkill = async (req, res) => {
   try {
-    const userId = req.user.id;
-
-    const skills = await db.skill.findMany({
-      where: {
-        authorId: userId,
-      },
-    });
+    const skills = await db.skill.findMany();
 
     return res.status(200).json({
       message: "Skills found successfully",
