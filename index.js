@@ -3,6 +3,7 @@ import cors from "cors";
 import userRoute from "./routes/userRoute.js";
 import skillRoute from "./routes/skillRoute.js";
 import ProjectRoute from "./routes/ProjectRoute.js";
+import PostRoute from "./routes/PostRoute.js";
 const app = express();
 
 app.use(
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 app.use(userRoute);
 app.use(skillRoute);
 app.use(ProjectRoute);
+app.use(PostRoute);
 
 app.listen(5000, () => {
   console.log("Server is running on port 5000");

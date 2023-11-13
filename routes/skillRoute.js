@@ -7,7 +7,7 @@ import {
 } from "../controllers/skillController.js";
 const skillRoute = express.Router();
 
-skillRoute.get("/skills", GetSkill);
+skillRoute.get("/skills:userId", GetSkill);
 skillRoute.post("/skills", verifyToken, AddSkill);
 skillRoute.delete("/skills/:id", verifyToken, DeleteSkill);
 export default skillRoute;
