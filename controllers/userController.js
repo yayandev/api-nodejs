@@ -288,3 +288,26 @@ export const updateProfile = async (req, res) => {
     });
   }
 };
+
+export const getMyProject = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const projects = await db.project.findMany({
+      where: {
+        authorId: userId,
+      },
+    });
+
+    return res.status(200).json({
+      message: "Projects found successfully",
+      success: true,
+      data: projects,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};

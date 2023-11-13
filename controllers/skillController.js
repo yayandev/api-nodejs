@@ -41,11 +41,7 @@ export const AddSkill = async (req, res) => {
 
 export const GetSkill = async (req, res) => {
   try {
-    const { userId } = req.params;
     const skills = await db.skill.findMany({
-      where: {
-        authorId: userId,
-      },
       select: {
         id: true,
         name: true,
