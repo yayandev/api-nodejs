@@ -5,7 +5,7 @@ var storage = multer.diskStorage({
     callback(null, "./public/uploads");
   },
   filename: function (req, file, callback) {
-    callback(null, Date.now() + file.originalname.replace(/\s+/g, ""));
+    callback(null, Date.now() + "-" + file.originalname.replace(/\s+/g, ""));
   },
 });
 
