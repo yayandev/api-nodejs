@@ -15,7 +15,7 @@ export const AddProject = async (req, res) => {
     }
 
     const image =
-      req.protocol + "://" + req.get("host") + "/uploads/" + file.filename;
+      "https" + "://" + req.get("host") + "/uploads/" + file.filename;
 
     const id_image = file.filename;
 
@@ -236,7 +236,7 @@ export const updateProject = async (req, res) => {
 
     if (file) {
       const image =
-        req.protocol + "://" + req.get("host") + "/uploads/" + file.filename;
+        "https" + "://" + req.get("host") + "/uploads/" + file.filename;
 
       const id_image = file.filename;
 
