@@ -1,9 +1,9 @@
-import cloudinary from "../utils/cloduinary.js";
 import { db } from "../utils/prisma.js";
+import fs from "fs";
 export const AddProject = async (req, res) => {
   try {
     const body = req.body;
-    const file = await req.file;
+    const file = req.file;
     const { title, description, skills } = body;
     const authorId = req.user.id;
 
@@ -14,42 +14,34 @@ export const AddProject = async (req, res) => {
       });
     }
 
-    cloudinary.uploader
-      .upload_stream({ resource_type: "auto" }, async (error, result) => {
-        if (error) {
-          return res.status(500).json({
-            message: error.message,
-            success: false,
-          });
-        }
+    const image =
+      req.protocol + "://" + req.get("host") + "/uploads/" + file.filename;
 
-        const { public_id, secure_url } = result;
+    const id_image = file.filename;
 
-        const newProject = await db.project.create({
-          data: {
-            title,
-            description,
-            skilsIds: JSON.parse(skills),
-            authorId,
-            image: secure_url,
-            id_image: public_id,
-          },
-        });
+    const newProject = await db.project.create({
+      data: {
+        title,
+        description,
+        skilsIds: JSON.parse(skills),
+        authorId,
+        image,
+        id_image,
+      },
+    });
 
-        if (!newProject) {
-          return res.status(400).json({
-            message: "Project not created",
-            success: false,
-          });
-        }
+    if (!newProject) {
+      return res.status(400).json({
+        message: "Project not created",
+        success: false,
+      });
+    }
 
-        res.json({
-          message: "Project created successfully",
-          success: true,
-          data: newProject,
-        });
-      })
-      .end(file.buffer);
+    res.json({
+      message: "Project created successfully",
+      success: true,
+      data: newProject,
+    });
   } catch (error) {
     return res.status(500).json({
       message: error.message,
@@ -175,15 +167,9 @@ export const deleteOne = async (req, res) => {
       });
     }
 
-    const deleteImageResult = await cloudinary.uploader.destroy(id_image);
+    // hapus image dari directory
 
-    if (!deleteImageResult) {
-      return res.json({
-        message: "Project not deleted",
-        error: "Failed to delete image",
-        success: false,
-      });
-    }
+    fs.unlinkSync("./public/uploads/" + id_image);
 
     const deleteProject = await db.project.delete({
       where: {
@@ -202,7 +188,6 @@ export const deleteOne = async (req, res) => {
       message: "Project deleted successfully",
       success: true,
       data: project,
-      deleteImageResult,
     });
   } catch (error) {
     return res.json({
@@ -250,49 +235,39 @@ export const updateProject = async (req, res) => {
     const idImageOld = project.id_image;
 
     if (file) {
-      cloudinary.uploader
-        .upload_stream({ resource_type: "auto" }, async (error, result) => {
-          if (error) {
-            return res.status(500).json({
-              message: error.message,
-              success: false,
-            });
-          }
+      const image =
+        req.protocol + "://" + req.get("host") + "/uploads/" + file.filename;
 
-          const { public_id, secure_url } = result;
+      const id_image = file.filename;
 
-          const updateProject = await db.project.update({
-            where: {
-              id: id,
-            },
-            data: {
-              title,
-              description,
-              skilsIds: JSON.parse(skills),
-              authorId,
-              image: secure_url,
-              id_image: public_id,
-            },
-          });
+      const updateProject = await db.project.update({
+        where: {
+          id: id,
+        },
+        data: {
+          title,
+          description,
+          skilsIds: JSON.parse(skills),
+          authorId,
+          image,
+          id_image,
+        },
+      });
 
-          if (!updateProject) {
-            return res.status(400).json({
-              message: "Project not updated",
-              success: false,
-            });
-          }
+      if (!updateProject) {
+        return res.status(400).json({
+          message: "Project not updated",
+          success: false,
+        });
+      }
 
-          const deleteImageResult = await cloudinary.uploader.destroy(
-            idImageOld
-          );
+      fs.unlinkSync("./public/uploads/" + idImageOld);
 
-          return res.json({
-            message: "Project updated successfully",
-            success: true,
-            data: updateProject,
-          });
-        })
-        .end(file.buffer);
+      return res.json({
+        message: "Project updated successfully",
+        success: true,
+        data: updateProject,
+      });
     }
 
     const updateProject = await db.project.update({

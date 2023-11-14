@@ -20,9 +20,10 @@ export const getAllPosts = async (req, res) => {
 export const addPosts = async (req, res) => {
   try {
     const file = req.file;
-
+    const url_image =
+      req.protocol + "://" + req.get("host") + "/uploads/" + file.filename;
     res.json({
-      file,
+      url_image,
     });
   } catch (error) {
     return res.status(500).json({
