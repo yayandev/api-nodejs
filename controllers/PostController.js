@@ -17,13 +17,17 @@ export const getAllPosts = async (req, res) => {
   }
 };
 
-// export const addPosts = async (req, res) => {
-//   try {
-//     const body = req.body;
-//   } catch (error) {
-//     return res.status(500).json({
-//       message: error.message,
-//       success: false,
-//     });
-//   }
-// };
+export const addPosts = async (req, res) => {
+  try {
+    const file = req.file;
+
+    res.json({
+      file,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};

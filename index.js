@@ -11,9 +11,9 @@ app.use(
     origin: "*",
   })
 );
+app.use(express.static("public"));
 
 app.use(express.json());
-
 app.get("/", (req, res) => {
   res.json({
     message: "Welcome to my API",
