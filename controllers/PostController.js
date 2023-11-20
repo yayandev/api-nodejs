@@ -328,6 +328,23 @@ export const getPostByAuthor = async (req, res) => {
       });
     }
 
+    const author = await db.user.findUnique({
+      where: {
+        id: authorId,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    if (!author) {
+      return res.status(404).json({
+        message: "Author not found",
+        success: false,
+      });
+    }
+
     const posts = await db.post.findMany({
       where: {
         authorId: authorId,
