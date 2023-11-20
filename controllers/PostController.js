@@ -3,7 +3,11 @@ import fs from "fs";
 
 export const getAllPosts = async (req, res) => {
   try {
-    const posts = await db.post.findMany();
+    const posts = await db.post.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
     return res.status(200).json({
       message: "Posts found successfully",
@@ -257,6 +261,97 @@ export const getOnePosts = async (req, res) => {
       message: "Post fetched successfully",
       success: true,
       data: post,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
+
+export const searchPost = async (req, res) => {
+  try {
+    const search = req.params.q;
+
+    if (!search) {
+      return res.status(400).json({
+        message: "Please provide all required fields",
+        success: false,
+      });
+    }
+
+    const posts = await db.post.findMany({
+      where: {
+        title: {
+          contains: search,
+          mode: "insensitive",
+        },
+      },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        image: true,
+        createdAt: true,
+        updatedAt: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    return res.status(200).json({
+      message: "Posts fetched successfully",
+      success: true,
+      data: posts,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
+
+export const getPostByAuthor = async (req, res) => {
+  try {
+    const authorId = req.params.authorId;
+
+    if (!authorId) {
+      return res.status(400).json({
+        message: "Please provide all required fields",
+        success: false,
+      });
+    }
+
+    const posts = await db.post.findMany({
+      where: {
+        authorId: authorId,
+      },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        image: true,
+        createdAt: true,
+        updatedAt: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    return res.status(200).json({
+      message: "Posts fetched successfully",
+      success: true,
+      data: posts,
     });
   } catch (error) {
     return res.status(500).json({
