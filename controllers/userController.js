@@ -2,7 +2,7 @@ import { db } from "../utils/prisma.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { TokenBlack } from "../middlewares/Token.js";
-
+import fs from "fs";
 export const Register = async (req, res) => {
   try {
     const { name, email, password, confirmPassword } = req.body;
@@ -101,6 +101,7 @@ export const Login = async (req, res) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      profile_picture: user.profile_picture,
     };
 
     const token = jwt.sign(dataToken, process.env.JWT_SECRET);
@@ -113,6 +114,7 @@ export const Login = async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        profile_picture: user.profile_picture,
       },
     });
   } catch (error) {
@@ -135,6 +137,7 @@ export const Profile = async (req, res) => {
         id: true,
         name: true,
         email: true,
+        profile_picture: true,
       },
     });
 
@@ -303,6 +306,123 @@ export const getMyProject = async (req, res) => {
       message: "Projects found successfully",
       success: true,
       data: projects,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
+
+export const updateProfilePicture = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Please provide all required fields",
+        success: false,
+      });
+    }
+    const user = await db.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+
+    const image =
+      "https" + "://" + req.get("host") + "/uploads/" + req.file.filename;
+
+    const updatedUser = await db.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        profile_picture: image,
+        id_profile_picture: req.file.filename,
+      },
+    });
+
+    if (!updatedUser) {
+      return res.status(500).json({
+        message: "Failed to update profile picture",
+        success: false,
+      });
+    }
+
+    const oldImage = user.profile_picture;
+
+    if (oldImage !== "default.png") {
+      const filename = user.id_profile_picture;
+      // delete image in directory
+      fs.unlinkSync(`./public/uploads/${filename}`);
+    }
+
+    return res.status(200).json({
+      message: "Profile picture updated successfully",
+      success: true,
+      data: image,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
+
+export const resetProfilePicture = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await db.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+
+    const filename = user.id_profile_picture;
+
+    if (filename !== "default.png") {
+      // delete image in directory
+      fs.unlinkSync(`./public/uploads/${filename}`);
+    }
+
+    const updatedUser = await db.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        profile_picture: "default.png",
+        id_profile_picture: "default.png",
+      },
+    });
+
+    if (!updatedUser) {
+      return res.status(500).json({
+        message: "Failed to reset profile picture",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Profile picture reset successfully",
+      success: true,
     });
   } catch (error) {
     return res.status(500).json({
