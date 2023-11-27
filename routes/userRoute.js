@@ -4,6 +4,7 @@ import {
   Logout,
   Profile,
   Register,
+  changeEmail,
   changePassword,
   getMyProject,
   resetProfilePicture,
@@ -30,5 +31,6 @@ userRoute.put(
   updateProfilePicture
 );
 userRoute.put("/profile/picture/reset", verifyToken, resetProfilePicture);
+userRoute.put("/profile/email", verifyToken, changeEmail);
 
 export default userRoute;

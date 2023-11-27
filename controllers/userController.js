@@ -431,3 +431,85 @@ export const resetProfilePicture = async (req, res) => {
     });
   }
 };
+
+export const changeEmail = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Please provide all required fields",
+        success: false,
+      });
+    }
+
+    const user = await db.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+
+    const isMatch = await bcryptjs.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Password is incorrect",
+        success: false,
+      });
+    }
+
+    const validateEmail = await db.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (validateEmail) {
+      return res.status(400).json({
+        message: "Email already exists",
+        success: false,
+      });
+    }
+
+    const updatedUser = await db.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        email,
+      },
+    });
+
+    if (!updatedUser) {
+      return res.status(500).json({
+        message: "Failed to change email",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Email changed successfully",
+      success: true,
+      data: {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        profile_picture: updatedUser.profile_picture,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
