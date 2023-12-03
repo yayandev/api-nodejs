@@ -513,3 +513,38 @@ export const changeEmail = async (req, res) => {
     });
   }
 };
+
+export const statistiks = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await db.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        name: true,
+        _count: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "User statistics",
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};

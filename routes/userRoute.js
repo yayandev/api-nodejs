@@ -8,6 +8,7 @@ import {
   changePassword,
   getMyProject,
   resetProfilePicture,
+  statistiks,
   updateProfile,
   updateProfilePicture,
 } from "../controllers/userController.js";
@@ -32,5 +33,6 @@ userRoute.put(
 );
 userRoute.put("/profile/picture/reset", verifyToken, resetProfilePicture);
 userRoute.put("/profile/email", verifyToken, changeEmail);
+userRoute.get("/my_statistiks", verifyToken, statistiks);
 
 export default userRoute;
