@@ -73,6 +73,23 @@ export const GetSkill = async (req, res) => {
     const take = Number(req.query.take) || 5;
     const skip = Number(req.query.skip) || 0;
 
+    if (req.query.take === "all") {
+      const skills = await db.skill.findMany({
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          id_image: true,
+        },
+      });
+
+      return res.status(200).json({
+        message: "Skills found successfully",
+        success: true,
+        data: skills,
+      });
+    }
+
     const skills = await db.skill.findMany({
       select: {
         id: true,
