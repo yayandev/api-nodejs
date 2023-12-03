@@ -70,6 +70,9 @@ export const AddSkill = async (req, res) => {
 
 export const GetSkill = async (req, res) => {
   try {
+    const take = Number(req.query.take) || 5;
+    const skip = Number(req.query.skip) || 0;
+
     const skills = await db.skill.findMany({
       select: {
         id: true,
@@ -77,12 +80,20 @@ export const GetSkill = async (req, res) => {
         image: true,
         id_image: true,
       },
+      take,
+      skip,
     });
+
+    const jumlahSkill = await db.skill.count();
+
+    const nextPage = jumlahSkill > skip + take ? true : false;
 
     return res.status(200).json({
       message: "Skills found successfully",
       success: true,
       data: skills,
+      nextPage,
+      jumlahSkill,
     });
   } catch (error) {
     return res.status(500).json({
@@ -101,6 +112,12 @@ export const DeleteSkill = async (req, res) => {
         id,
       },
     });
+
+    const id_image = skill.id_image;
+
+    if (id_image !== "default") {
+      fs.unlinkSync(`./public/uploads/${id_image}`);
+    }
 
     if (!skill) {
       return res.status(400).json({
