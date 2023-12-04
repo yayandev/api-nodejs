@@ -40,6 +40,8 @@ model Project {
    description String
    image     String
    id_image  String
+   link_github String @default("")
+   link_demo String @default("")
    author    User     @relation(fields: [authorId], references: [id])
    authorId  String   @db.ObjectId
    skilsIds String[] @db.ObjectId

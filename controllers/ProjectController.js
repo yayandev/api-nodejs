@@ -4,10 +4,17 @@ export const AddProject = async (req, res) => {
   try {
     const body = req.body;
     const file = req.file;
-    const { title, description, skills } = body;
+    const { title, description, skills, link_github, link_demo } = body;
     const authorId = req.user.id;
 
-    if (!title || !description || !skills || !file) {
+    if (
+      !title ||
+      !description ||
+      !skills ||
+      !file ||
+      !link_github ||
+      !link_demo
+    ) {
       return res.status(400).json({
         message: "Please provide all required fields",
         success: false,
@@ -27,6 +34,8 @@ export const AddProject = async (req, res) => {
         authorId,
         image,
         id_image,
+        link_demo,
+        link_github,
       },
     });
 
@@ -60,6 +69,8 @@ export const getAllProjects = async (req, res) => {
         image: true,
         createdAt: true,
         updatedAt: true,
+        link_demo: true,
+        link_github: true,
         author: {
           select: {
             id: true,
@@ -102,6 +113,8 @@ export const getOneProject = async (req, res) => {
         image: true,
         createdAt: true,
         updatedAt: true,
+        link_demo: true,
+        link_github: true,
         author: {
           select: {
             id: true,
@@ -202,10 +215,10 @@ export const updateProject = async (req, res) => {
     const body = req.body;
     const file = await req.file;
     const id = req.params.id;
-    const { title, description, skills } = body;
+    const { title, description, skills, link_demo, link_github } = body;
     const authorId = req.user.id;
 
-    if (!title || !description || !skills) {
+    if (!title || !description || !skills || !link_demo || !link_github) {
       return res.status(400).json({
         message: "Please provide all required fields",
         success: false,
@@ -251,6 +264,8 @@ export const updateProject = async (req, res) => {
           authorId,
           image,
           id_image,
+          link_demo,
+          link_github,
         },
       });
 
@@ -278,6 +293,8 @@ export const updateProject = async (req, res) => {
         title,
         description,
         skilsIds: JSON.parse(skills),
+        link_demo,
+        link_github,
       },
     });
 
