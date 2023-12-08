@@ -45,7 +45,7 @@ export const addPosts = async (req, res) => {
     }
 
     const image =
-      req.protocol + "://" + req.get("host") + "/uploads/" + file.filename;
+      "https" + "://" + req.get("host") + "/uploads/" + file.filename;
 
     const id_image = file.filename;
 
@@ -148,7 +148,7 @@ export const updatePost = async (req, res) => {
     fs.unlinkSync("./public/uploads/" + oldImage);
 
     const image =
-      req.protocol + "://" + req.get("host") + "/uploads/" + file.filename;
+      "https" + "://" + req.get("host") + "/uploads/" + file.filename;
 
     const id_image = file.filename;
 
