@@ -9,6 +9,9 @@ export const getFiles = async (req, res) => {
       where: {
         authorId: userID,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
     return res.status(200).json({
