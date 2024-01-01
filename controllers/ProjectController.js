@@ -84,6 +84,9 @@ export const getAllProjects = async (req, res) => {
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
     return res.json({
