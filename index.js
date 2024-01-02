@@ -6,6 +6,7 @@ import ProjectRoute from "./routes/ProjectRoute.js";
 import PostRoute from "./routes/PostRoute.js";
 import FilesRoute from "./routes/FilesRoute.js";
 import ProductRoute from "./routes/ProductRoute.js";
+import EducationRoute from "./routes/EducationRoute.js";
 const app = express();
 
 app.use(
@@ -29,6 +30,7 @@ app.use(ProjectRoute);
 app.use(PostRoute);
 app.use(FilesRoute);
 app.use(ProductRoute);
+app.use(EducationRoute);
 
 app.listen(5000, () => {
   console.log("Server is running on port 5000");

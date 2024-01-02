@@ -9,6 +9,7 @@ export const getAllProducts = async (req, res) => {
         image: true,
         price: true,
         id_image: true,
+        description: true,
       },
     });
 

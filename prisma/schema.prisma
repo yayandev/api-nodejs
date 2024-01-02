@@ -21,6 +21,7 @@ model User {
    updatedAt DateTime @updatedAt
    files Files[]
    products Product[]
+   educations Education[]
 }
 
 model Skill {
@@ -83,6 +84,20 @@ model Product {
    image String
    id_image String
    price String
+   author    User     @relation(fields: [authorId], references: [id])
+   authorId  String   @db.ObjectId
+   createdAt DateTime @default(now())
+   updatedAt DateTime @updatedAt
+}
+
+model Education {
+   id String @id @default(auto()) @map("_id") @db.ObjectId
+   name String
+   description String
+   image String
+   id_image String
+   time String @default("Present")
+   link String @default("")
    author    User     @relation(fields: [authorId], references: [id])
    authorId  String   @db.ObjectId
    createdAt DateTime @default(now())

@@ -75,12 +75,14 @@ export const getAllProjects = async (req, res) => {
           select: {
             id: true,
             name: true,
+            profile_picture: true,
           },
         },
         skills: {
           select: {
             id: true,
             name: true,
+            image: true,
           },
         },
       },
